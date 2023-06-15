@@ -24,11 +24,96 @@ function runSearchAndMenu(people) {
     }
 }
 
-function searchByTrait(people, trait) {
+function searchByTraits(people) {
+    const traitChoice = validatedPrompt('Please enter in which trait you would like to search by.',['height', 'weight', 'eye color', 'occupation']);
+    let traitValue;
+    switch (traitChoice) {
+        case 'Height':
+            traitValue = validatedPrompt('Please enter in the height to search by (in inches).', [], 'number');
+            break;
+        case 'weight':
+            traitValue = validatedPrompt('Please enter in the weight to search by (in pounds).', [], 'numnber');
+            break;
+        case 'eye color':
+            traitValue = validatedPrompt('Pleas enter in the eye color to search by,', ['Brown','blue', 'green','hazel','amber']);
+            break;
+        case 'occupation':
+            traitValue = validatedPrompt('Please enterin the occupation to search by.', [], 'string');
+            break; 
+            default:
+                return searchByTraits(people);
+    }
+
     const results = people.filter(person => {
-        return person.trait;
+        switch (traitChoice) {
+            case 'height':
+                return person.height === traitValue;
+            case 'weight':
+                return person.weight === traitValue;
+            case 'eye color':
+                return person.eyeColor === traitValue
+                case 'occupation':
+                    return person.occupation.toLowerCase().includes(traitValue.toLowerCase());
+        }
     });
+
+    if(results.length === 0) {
+        alert('No people found with ${traitChoice} of ${traitValue}.');
+    } else {
+        console.log('People found with ${traitChoice} of ${traitValue}:');
+        results.forEach(person => console.log('${person.firstName}${person.lastName}'));
+    }
+
     return results;
+
+}
+
+
+function displayFamily(people, person) {
+    const {parents, currentSpouse} = person;
+    const siblings = findSiblings(people, person);
+    const family = [];
+
+    // Add Parents to family array
+    parents.forEach(parentId => {
+        const parent = findById(people, parentId);
+        family.push({ name: '${parent.firstName} ${parent.lastName}', relation: 'parent'});
+    });
+
+    // Add spouse to family array
+    if(currentSpouse) {
+        const spouse = findById(pepople, currentSpouse);
+        family.push({ name: '${spouse.firstName} ${spouse.lastName}', relation: 'parent'});
+    }
+
+    // Add Siblings to family array
+    siblings.forEach(sibling => {
+        family.push({ name: '${sibling.firstName} ${sibling.lastName}', relation: 'sibling'});
+    });
+
+    //Display family members
+    console.log('Family members of ${person.firstName} ${person.lastName}:');
+    family.forEach(member => {
+        console.log('${member.relation}: ${member.name}');
+    });
+
+
+}
+
+
+
+function getDescendants(person, people) {
+    const descendants = [];
+    if (person.children.length === 0) {
+        return descendants;
+    }
+    for (let childId of person.children) {
+        const child = people.find(p => p.id === childId);
+        const childDescendants = getDescendants(child, people);
+        descendants.push(...childDescendants, child.firstName + ' ' + child.lastName);
+    }
+
+    return descendants
 }
 
 
@@ -49,38 +134,32 @@ function searchPeopleDataSet(people) {
             results = searchByName(people);
             break;
         case 'traits':
-            const traitChoice = validatedPrompt('Please enter the trait you would like to search for.',
-            ['eyeColor', 'gender', 'occupation']);
-            const traitValue = validatedPrompt('Please enter the ${traitChoice} value you would like to search for.');
-
             
-         results = searchByTraits(people, traitValue);
+            results = searchByTraits(people);
             break;
         default:
             return searchPeopleDataSet(people);
     }
 
-    if (results.length === 0) {
-        console.log('No results found.');
-    } else {
-        results.forEach(person => {
-            console.log('ID:', person.id);
-            console.log('First Name.',person.firstName);
-            console.log('Last Name.', person.lastName);
-            console.log('Gender:', person.gender);
-            console.log('Date of Birth:', person.dob);
-            console.log('Height:', person.height);
-            console.log('Weight:', person.weight);
-            console.log('Eye Color:', person.eyeColor);
-            console.log('Occupation:', person.occupation);
-            console.log('Parent:', person.parents);
-            console.log('Current Spouse:', person.currentSpouse);
-        });
-    }
+    
 
-    return results;
 
-    function displayFamily
+if (results.length === 0) {
+    console.log('No results found.');
+} else {
+    results.forEach(person => {
+        console.log('First Name:', person.firstName);
+        console.log('Last Name:', person.lastName);
+        console.log('Height:', person.height);
+        console.log('Weight:', person.weight);
+        console.log('Eye Color:', person.eyeColor);
+        console.log('Occupation:', person.occupation);
+        console.log('Parents:', person.parents);
+        console.log('Current Spouse:', person.currentSpouse);
+    });
+}
+
+return results;
 }
 
 function searchById(people) {
