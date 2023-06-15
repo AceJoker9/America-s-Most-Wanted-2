@@ -25,6 +25,39 @@ function runSearchAndMenu(people) {
 }
 
 function searchByTraits(people) {
+
+
+    const searchCriteria = validatedPromptForTraits();
+    let outcome = people;
+    for (let i = 0; i < searchCriteria.length; i++) {
+        const trait = searchCriteria[i].trait;
+        const value = searchCriteria[i].value;
+        if(trait === 'name') {
+            outcome = outcome.filter(person => {
+                const fullName = '${person.firstName} ${person.lastName}';
+                return fullName.toLowerCase().includes(value.toLowerCase());
+            });
+        } else {
+            outcome = outcome.filter(person => {
+                return person[trait].toLowerCase().includes(value.toLowerCase());
+            });
+        }
+    }
+
+    if (outcome.length > 1) {
+        const furtherFilerChoice = validatedPrompt('Would you like to further filter down the results?',
+        ['yes', 'no']
+        );
+        if (furtherFilerChoice === 'yes') {
+            outcome = searchByTraits(outcome);
+        }
+    }
+
+    return outcome;
+
+
+
+
     const traitChoice = validatedPrompt('Please enter in which trait you would like to search by.',['height', 'weight', 'eye color', 'occupation']);
     let traitValue;
     switch (traitChoice) {
@@ -116,6 +149,26 @@ function getDescendants(person, people) {
     return descendants
 }
 
+
+
+
+const searchCriteria = [
+    { trait: 'gender', value: 'female',},
+    {trait: 'gender', value: 'male'},
+    {trait: 'eyeColor', value: 'black'},
+    { trait: 'eyeColor', value: 'brown',},
+    {trait: 'eyeColor', value: 'blue'},
+    { trait: 'eyeColor', value: 'green'}, 
+    { trait: 'eyeColor', value: 'hazel'}, 
+    {trait: 'occupation', value: 'doctor'},
+    {trait: 'occupation', value: 'landscaper'},
+    {trait: 'occupation', value: 'nurse'},
+    {trait: 'occupation', value: 'programmer'},
+    {trait: 'occupation', value: 'assistant'},
+    {trait: 'occupation', value: 'architect'},
+    {trait: 'occupation', value: 'politician'},
+    {trait: 'occupation', value: 'student'},
+]
 
 
 function searchPeopleDataSet(people) {

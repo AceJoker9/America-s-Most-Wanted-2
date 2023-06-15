@@ -80,7 +80,7 @@ function searchPeopleDataSet(people) {
 
     return results;
 
-    function displayFamily
+    
 }
 
 function searchById(people) {
