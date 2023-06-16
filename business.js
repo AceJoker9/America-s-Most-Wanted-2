@@ -223,7 +223,7 @@ function searchPeopleDataSet(people) {
                         return person.eyeColor === traitValue
                         case 'occupation':
                             return person.occupation.toLowerCase().includes(traitValue.toLowerCase());
-                });
+                })
             }
 
         
@@ -264,6 +264,8 @@ function searchPeopleDataSet(people) {
             
             return results;
             }
+    
+        
 
 
 
@@ -346,7 +348,7 @@ function mainMenu(person, people) {
             displayPeople('Family', personFamily);
             break;
             case "descendants":
-                let personDescendants = findPersonDescendants(person, people);
+                let personDescendants = personDescendants(person, people);
                 displayPeople('Descendants', personDescendants);
                 break;
                 case 'quit':
@@ -363,6 +365,65 @@ function mainMenu(person, people) {
 
 
            
+           function findPersonFamily(person, people) {
+            let immediateFamily = [];
+            
+            //Add spouse, if they have one
+            if(person.currentSpouse) {
+                const spouse = people.find(p => p.id === person.currentSpouse);
+                if (spouse) {
+                    const relation = spouse.gender === 'male' ? 'Husband': 'Wife';
+                    immediateFamily.push({
+                        id: spouse.id,
+                        firstName: spouse.firstName,
+                        lastName: spouse.lastName,
+                        relation
+                    });
+                }
+            }
+
+            // Add parents, if they have any 
+            for(let parentId of person.parens) {
+                const parent = people.find(p => p.id === parentId);
+                if (parent) {
+                    const relation = parent.gender === 'male' ? 'Father' : 'Mother';
+                    immediateFamily.push({
+                        id: parentId,
+                        firstName: parent.firstName,
+                        lastName: parent.lastName,
+                        relation});
+                    }
+                }
+
+                // Add Siblings
+                for(let sibling of people) {
+                    if (sibling.id !== person.id && sibling.parents.includes(person.id)) {
+                        const relation = sibling.gender === 'male' ? 'Brother' : 'Sister';
+                        immediateFamily.push({
+                            id: sibling.id,
+                            firstName: sibling.firstName,
+                            lastName: sibling.lastName,
+                            relation})
+                        }
+                    }
+
+                    return immediateFamily;
+                }
+
+
+
+                        
+                    
+                
+
+                    
+                
+            
+
+                    
+                
+            
+
            
            
            
